@@ -1,4 +1,21 @@
-# We need JDK as some of the lessons needs to be able to compile Java code
+# Use a multi-stage build to compile the project first, then create a lightweight runtime image
+
+# Stage 1: Build
+FROM docker.io/eclipse-temurin:21-jdk-jammy as builder
+
+WORKDIR /build
+# Copy the Maven wrapper and pom.xml first to leverage Docker caching
+COPY .mvn/ .mvn/
+COPY mvnw mvnw
+COPY pom.xml .
+# Run the dependencies download first to use Docker's cache if there are no changes
+RUN ./mvnw dependency:go-offline -B
+
+# Copy the source code and compile it
+COPY src ./src
+RUN ./mvnw clean package -DskipTests
+
+# Stage 2: Runtime
 FROM docker.io/eclipse-temurin:21-jdk-jammy
 
 LABEL name="WebGoat: A deliberately insecure Web Application"
@@ -11,7 +28,8 @@ RUN \
 
 USER webgoat
 
-COPY --chown=webgoat target/webgoat-*.jar /home/webgoat/webgoat.jar
+# Copy the built .jar file from the builder stage
+COPY --from=builder /build/target/webgoat-*.jar /home/webgoat/webgoat.jar
 
 EXPOSE 8080
 EXPOSE 9090
