@@ -1,14 +1,10 @@
-# Use a multi-stage build to compile the project first, then create a lightweight runtime image
-
 # Stage 1: Build
 FROM docker.io/eclipse-temurin:21-jdk-jammy as builder
 
-WORKDIR /build
 # Copy the Maven wrapper and pom.xml first to leverage Docker caching
 COPY .mvn/ .mvn/
 COPY mvnw mvnw
 COPY pom.xml .
-# Run the dependencies download first to use Docker's cache if there are no changes
 RUN ./mvnw dependency:go-offline -B
 
 # Copy the source code and compile it
@@ -18,9 +14,6 @@ RUN ./mvnw clean package -DskipTests
 # Stage 2: Runtime
 FROM docker.io/eclipse-temurin:21-jdk-jammy
 
-LABEL name="WebGoat: A deliberately insecure Web Application"
-LABEL maintainer="WebGoat team"
-
 RUN \
   useradd -ms /bin/bash webgoat && \
   chgrp -R 0 /home/webgoat && \
@@ -29,14 +22,12 @@ RUN \
 USER webgoat
 
 # Copy the built .jar file from the builder stage
-COPY --from=builder /build/target/webgoat-*.jar /home/webgoat/webgoat.jar
+COPY --from=builder target/webgoat-*.jar /home/webgoat/webgoat.jar
 
-EXPOSE 8080
-EXPOSE 9090
-
-ENV TZ=Europe/Amsterdam
+EXPOSE 8080 9090
 
 WORKDIR /home/webgoat
+
 ENTRYPOINT [ "java", \
    "-Duser.home=/home/webgoat", \
    "-Dfile.encoding=UTF-8", \
