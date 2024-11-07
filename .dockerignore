@@ -1,4 +1,10 @@
+# Ignore everything by default
 **
 
-!/target
-!/config/desktop
+# Include necessary files for Docker build
+!mvnw
+!.mvn/
+!pom.xml
+!src/
+!target/
+!config/desktop
