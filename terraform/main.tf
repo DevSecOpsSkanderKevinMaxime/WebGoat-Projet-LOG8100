@@ -1,3 +1,23 @@
+# resource "null_resource" "start_minikube" {
+#   provisioner "local-exec" {
+#     command = "minikube start --driver=docker --nodes=2"
+#   }
+
+#   # Ensure that Minikube is started before we proceed with setting up nodes
+#   triggers = {
+#     minikube = "started"
+#   }
+# }
+
+# resource "null_resource" "setup_nodes" {
+#   provisioner "local-exec" {
+#     command = "./setup_nodes.sh"
+#   }
+
+#   # Optional: add dependency on Kubernetes namespace or deployments to ensure nodes are available
+#   depends_on = [kubernetes_namespace.development, kubernetes_namespace.production]
+# }
+
 # Create namespace for deployment (development)
 resource "kubernetes_namespace" "development" {
   metadata {
@@ -12,10 +32,8 @@ resource "kubernetes_namespace" "production" {
   }
 }
 
-
-
 # Deployment configuration for Development environment
-resource "kubernetes_deployment" "development_example" {
+resource "kubernetes_deployment" "development" {
   metadata {
     name      = "webgoat-development"
     labels    = { test = "webgoat" }
@@ -35,8 +53,9 @@ resource "kubernetes_deployment" "development_example" {
       }
 
       spec {
+        # Node selector for development node
         node_selector = {
-          environment = "development" # Ensure this deployment runs on development nodes
+          environment = "development" # Runs on nodes labeled with "environment=development"
         }
 
         container {
@@ -80,7 +99,7 @@ resource "kubernetes_service" "webgoat_development" {
 }
 
 # Deployment configuration for Production environment
-resource "kubernetes_deployment" "production_example" {
+resource "kubernetes_deployment" "production" {
   metadata {
     name      = "webgoat-production"
     labels    = { test = "webgoat" }
@@ -100,8 +119,9 @@ resource "kubernetes_deployment" "production_example" {
       }
 
       spec {
+        # Node selector for production node
         node_selector = {
-          environment = "production" # Ensure this deployment runs on production nodes
+          environment = "production" # Runs on nodes labeled with "environment=production"
         }
 
         container {
