@@ -25,16 +25,16 @@
         debug:
             msg: "Port forwarding is running, access WebGoat at http://localhost:8080/WebGoat/login"
 
-    - name: Ensure WebGoat service is accessible
-      command: curl http://localhost:8080/WebGoat/login
-      register: result
-      ignore_errors: yes
+      - name: Ensure WebGoat service is accessible
+        command: curl http://localhost:8080/WebGoat/login
+        register: result
+        ignore_errors: yes
 
-    - name: Display curl response
-      debug:
-        msg: "Curl request output: {{ result.stdout }}"
+      - name: Display curl response
+        debug:
+            msg: "Curl request output: {{ result.stdout }}"
 
-    - name: Check curl response status
-      debug:
-        msg: "Curl request failed with status: {{ result.rc }}"
-      when: result.rc != 0
+      - name: Check curl response status
+        debug:
+            msg: "Curl request failed with status: {{ result.rc }}"
+        when: result.rc != 0
