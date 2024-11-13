@@ -63,4 +63,4 @@ jobs:
 
             - name: Run Ansible Playbook for Initial Configuration
               run: |
-                  ansible-playbook ./playbooks/playbook.yml
+                  ansible-playbook ./ansible/playbook.yml
