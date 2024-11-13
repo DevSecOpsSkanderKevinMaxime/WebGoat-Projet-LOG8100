@@ -55,6 +55,6 @@ webgoat.script
 TestClass.class
 **/*.flattened-pom.xml
 /.gitconfig
-
+.venv/
 webgoat.gitconfig
 **/.terraform/*
