@@ -28,7 +28,7 @@
     - name: Ensure WebGoat service is accessible
       command: curl http://localhost:8080/WebGoat/login
       register: result
-      ignore_errors: yes  
+      ignore_errors: yes
 
     - name: Display curl response
       debug:
