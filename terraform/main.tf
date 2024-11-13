@@ -1,22 +1,3 @@
-# resource "null_resource" "start_minikube" {
-#   provisioner "local-exec" {
-#     command = "minikube start --driver=docker --nodes=2"
-#   }
-
-#   # Ensure that Minikube is started before we proceed with setting up nodes
-#   triggers = {
-#     minikube = "started"
-#   }
-# }
-
-# resource "null_resource" "setup_nodes" {
-#   provisioner "local-exec" {
-#     command = "./setup_nodes.sh"
-#   }
-
-#   # Optional: add dependency on Kubernetes namespace or deployments to ensure nodes are available
-#   depends_on = [kubernetes_namespace.development, kubernetes_namespace.production]
-# }
 
 # Create namespace for deployment (development)
 resource "kubernetes_namespace" "development" {
@@ -59,17 +40,16 @@ resource "kubernetes_deployment" "development" {
         }
 
         container {
-          image = "log8100projet/projetfinal:feature-Partie1-GithubAction-BuildTestDeploiement"
+          image = "log8100projet/projetfinal:latest"
           name  = "webgoat"
-
           resources {
-            limits = {
-              cpu    = "0.5"
+            requests = {
+              cpu    = "500m"
               memory = "512Mi"
             }
-            requests = {
-              cpu    = "250m"
-              memory = "50Mi"
+            limits = {
+              cpu    = "1"
+              memory = "1Gi"
             }
           }
           port {
@@ -91,7 +71,7 @@ resource "kubernetes_service" "webgoat_development" {
   spec {
     selector = { test = "webgoat" }
     port {
-      port        = 80
+      port        = 8080
       target_port = 8080
     }
     type = "NodePort"
@@ -125,17 +105,16 @@ resource "kubernetes_deployment" "production" {
         }
 
         container {
-          image = "log8100projet/projetfinal:feature-Partie1-GithubAction-BuildTestDeploiement"
+          image = "log8100projet/projetfinal:latest"
           name  = "webgoat"
-
           resources {
+            requests = {
+              cpu    = "500m"
+              memory = "512Mi"
+            }
             limits = {
               cpu    = "1"
               memory = "1Gi"
-            }
-            requests = {
-              cpu    = "500m"
-              memory = "256Mi"
             }
           }
           port {
@@ -157,7 +136,7 @@ resource "kubernetes_service" "webgoat_production" {
   spec {
     selector = { test = "webgoat" }
     port {
-      port        = 80
+      port        = 8080
       target_port = 8080
     }
     type = "NodePort"
