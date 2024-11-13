@@ -55,13 +55,12 @@ jobs:
                   chmod +x ./terraform/setup_minikube.sh
                   ./terraform/setup_minikube.sh
 
-            - name: Run Ansible Playbook for Initial Configuration
-              run: |
-                  ansible-playbook ./playbooks/setup-cluster.yml
-                  ansible-playbook ./playbooks/deploy-app.yml
-
             - name: Run Terraform Apply
               working-directory: ./terraform
               run: |
                   terraform init
                   terraform apply -auto-approve
+
+            - name: Run Ansible Playbook for Initial Configuration
+              run: |
+                  ansible-playbook ./playbooks/playbook.yml
