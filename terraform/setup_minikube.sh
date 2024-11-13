@@ -2,7 +2,7 @@
 
 # Step 1: Start Minikube with two nodes
 echo "Starting Minikube with two nodes..."
-minikube start --driver=docker --nodes=2 
+minikube start --driver=docker --nodes=2
 
 # Step 2: Get the list of nodes after Minikube is up
 echo "Waiting for Minikube nodes to be ready..."
