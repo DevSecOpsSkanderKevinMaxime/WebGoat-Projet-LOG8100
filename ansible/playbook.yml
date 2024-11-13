@@ -1,4 +1,3 @@
----
 - name: Kubernetes Port Forwarding for WebGoat
   hosts: localhost
   tasks:
