@@ -29,7 +29,7 @@
       #       msg: "Port forwarding is running, access WebGoat at http://localhost:8080/WebGoat/login"
 
       - name: Ensure WebGoat service is accessible
-        ansible.builtin.command: curl http://localhost:8080/WebGoat/login
+        ansible.builtin.command: curl http://192.169.42.2:8080/WebGoat/login
         register: result
         ignore_errors: yes
 
