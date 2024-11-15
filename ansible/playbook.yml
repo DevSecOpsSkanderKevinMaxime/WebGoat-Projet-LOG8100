@@ -2,31 +2,31 @@
   hosts: localhost
   tasks:
       - name: Check development pod status
-        ansible.builtin.command: kubectl get pods -n k8s-ns-development
+        ansible.builtin.command: kubectl get pods -n development
         register: result
 
       - name: Get feedback from kubectl
         debug:
             msg: "{{result.stdout}}"
-      - name: Forward port 8080 from WebGoat service to local machine
-        ansible.builtin.shell: "kubectl port-forward -n k8s-ns-development svc/webgoat-service-development 8080:8080"
-        async: 600
-        poll: 0
+      # - name: Forward port 8080 from WebGoat service to local machine
+      #   ansible.builtin.shell: "kubectl port-forward -n k8s-ns-development svc/webgoat-service-development 8080:8080"
+      #   async: 600
+      #   poll: 0
 
-      - name: Wait for port forwarding to start
-        pause:
-            minutes: 2
+      # - name: Wait for port forwarding to start
+      #   pause:
+      #       minutes: 2
 
-      - name: Ensure the port forwarding is still running
-        ansible.builtin.shell: "pgrep -f 'kubectl port-forward' || echo 'port-forward not running'"
-        register: pf_status
-        retries: 5
-        delay: 10
-        until: pf_status.stdout != 'port-forward not running'
+      # - name: Ensure the port forwarding is still running
+      #   ansible.builtin.shell: "pgrep -f 'kubectl port-forward' || echo 'port-forward not running'"
+      #   register: pf_status
+      #   retries: 5
+      #   delay: 10
+      #   until: pf_status.stdout != 'port-forward not running'
 
-      - name: Notify user about port forwarding
-        debug:
-            msg: "Port forwarding is running, access WebGoat at http://localhost:8080/WebGoat/login"
+      # - name: Notify user about port forwarding
+      #   debug:
+      #       msg: "Port forwarding is running, access WebGoat at http://localhost:8080/WebGoat/login"
 
       - name: Ensure WebGoat service is accessible
         ansible.builtin.command: curl http://localhost:8080/WebGoat/login
