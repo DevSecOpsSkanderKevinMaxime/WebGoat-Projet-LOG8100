@@ -99,6 +99,7 @@ resource "kubernetes_service" "development" {
     port {
       port        = 8080
       target_port = 8080
+      node_port   = 8080
     }
     type = "NodePort"
   }
@@ -115,6 +116,7 @@ resource "kubernetes_service" "production" {
     port {
       port        = 8080
       target_port = 8080
+      node_port   = 8080
     }
     type = "NodePort"
   }
