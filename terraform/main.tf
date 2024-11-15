@@ -1,4 +1,4 @@
-
+# defining here the namespaces used on kube
 resource "kubernetes_namespace" "development" {
   metadata {
     name = "development"
@@ -10,6 +10,8 @@ resource "kubernetes_namespace" "production" {
     name = "production"
   }
 }
+
+# setting the deployment strategy for each node
 
 resource "kubernetes_deployment" "development" {
   metadata {
@@ -44,22 +46,6 @@ resource "kubernetes_deployment" "development" {
         }
       }
     }
-  }
-}
-
-resource "kubernetes_service" "development" {
-  metadata {
-    name      = "development"
-    namespace = kubernetes_namespace.development.metadata[0].name
-  }
-
-  spec {
-    selector = { test = "webgoat" }
-    port {
-      port        = 8080
-      target_port = 8080
-    }
-    type = "NodePort"
   }
 }
 
@@ -100,6 +86,24 @@ resource "kubernetes_deployment" "production" {
   }
 }
 
+# setting up services which act as proxies to access the internal cluster nodes
+
+resource "kubernetes_service" "development" {
+  metadata {
+    name      = "development"
+    namespace = kubernetes_namespace.development.metadata[0].name
+  }
+
+  spec {
+    selector = { test = "webgoat" }
+    port {
+      port        = 8080
+      target_port = 8080
+    }
+    type = "NodePort"
+  }
+}
+
 resource "kubernetes_service" "production" {
   metadata {
     name      = "production"
@@ -115,3 +119,5 @@ resource "kubernetes_service" "production" {
     type = "NodePort"
   }
 }
+
+

@@ -2,9 +2,9 @@
 
 echo "Starting Minikube with two nodes..."
 # on macOS we would have to set the driver to docker 
-# therefore port forwarding is mendatory since docker has
+# therefore port forwarding is mandatory since docker has
 # limited network accessibility
-minikube start --nodes=2
+minikube start --driver=docker --nodes=2
 
 alias kubectl="minikube kubectl --"
 
