@@ -13,7 +13,8 @@ on:
 jobs:
   notify:
     runs-on: ubuntu-latest
-    permissions: write-all
+    permissions:
+        contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
