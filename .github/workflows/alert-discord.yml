@@ -20,7 +20,8 @@ jobs:
 
       - name: Dependabot Alerts to Discord
         env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD}}
+          GH_TOKEN: ${{ github.token }}
         run: |
           echo "Fetching Dependabot alerts..."
           alerts=$(gh api -H "Accept: application/vnd.github+json" /repos/${{ github.repository }}/dependabot/alerts)
