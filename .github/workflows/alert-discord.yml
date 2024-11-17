@@ -6,7 +6,9 @@ on:
   workflow_dispatch:  # Permet de lancer manuellement
   pull_request:
     branches: [ main ]
-
+  push:
+    branches:
+        - kevin/test
 
 jobs:
   notify:
