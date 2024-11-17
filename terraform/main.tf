@@ -99,7 +99,6 @@ resource "kubernetes_service" "development" {
     port {
       port        = 8080
       target_port = 8080
-      node_port   = 8080
     }
     type = "NodePort"
   }
@@ -116,10 +115,78 @@ resource "kubernetes_service" "production" {
     port {
       port        = 8080
       target_port = 8080
-      node_port   = 8080
     }
     type = "NodePort"
   }
 }
+
+resource "kubernetes_service" "devhealth" {
+  metadata {
+    name      = "devhealth"
+    namespace = kubernetes_namespace.development.metadata[0].name
+  }
+
+  spec {
+    selector = { test = "webgoat" }
+    port {
+      port        = 9090
+      target_port = 9090
+
+    }
+    type = "NodePort"
+  }
+}
+
+resource "kubernetes_service" "prodhealth" {
+  metadata {
+    name      = "prodhealth"
+    namespace = kubernetes_namespace.production.metadata[0].name
+  }
+
+  spec {
+    selector = { test = "webgoat" }
+    port {
+      port        = 9090
+      target_port = 9090
+    }
+    type = "NodePort"
+  }
+}
+
+resource "kubernetes_ingress_v1" "requests" {
+  metadata {
+    name      = "requests"
+    namespace = kubernetes_namespace.production.metadata[0].name
+  }
+
+  spec {
+    rule {
+      http {
+        path {
+          path      = "/nope/*"
+          path_type = "Prefix"
+          backend {
+            service {
+              name = kubernetes_service.production.metadata[0].name
+              port {
+                number = 8080
+              }
+            }
+          }
+        }
+
+      }
+    }
+    default_backend {
+      service {
+        name = kubernetes_service.prodhealth.metadata[0].name
+        port {
+          number = 9090
+        }
+      }
+    }
+  }
+}
+
 
 

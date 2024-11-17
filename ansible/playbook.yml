@@ -2,14 +2,14 @@
   hosts: localhost
   tasks:
       - name: Check development pod status
-        ansible.builtin.command: kubectl get pods -n development
+        ansible.builtin.command: kubectl get pods -n production
         register: result
 
       - name: Get feedback from kubectl
         debug:
             msg: "{{result.stdout}}"
       - name: Forward port 8080 from WebGoat service to local machine
-        ansible.builtin.shell: "kubectl port-forward -n development svc/development 8080:8080"
+        ansible.builtin.shell: "kubectl port-forward -n production svc/production 8080:8080"
         async: 600
         poll: 0
 
@@ -41,3 +41,6 @@
         debug:
             msg: "Curl request failed with status: {{ result.rc }}"
         when: result.rc != 0
+
+      - name: testing ingress rule for production
+        ansible.builtin.command: curl http://localhost:8080/WebGoat/login

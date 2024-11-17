@@ -1,6 +1,7 @@
 #!/bin/bash
 
 echo "Starting Minikube with two nodes..."
+minikube addons enable ingress
 minikube start --driver=docker --nodes=2
 
 alias kubectl="minikube kubectl --"
