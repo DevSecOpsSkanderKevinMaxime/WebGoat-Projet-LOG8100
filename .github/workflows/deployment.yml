@@ -7,7 +7,7 @@ on:
     #     - completed
     push:
         branches:
-            - feature/ansible-setup
+            - feature/image-analysis-tools
 
 jobs:
     push_to_registry:
@@ -45,22 +45,34 @@ jobs:
                       log8100projet/projetfinal:latest
                       ${{ steps.meta.outputs.tags }}
                   labels: ${{ steps.meta.outputs.labels }}
-            - name: Install Dependencies
-              run: |
-                  curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-                  sudo install minikube-linux-amd64 /usr/local/bin/minikube
+            - name: Scan docker image before deployment
+              uses: aquasecurity/trivy-action@0.28.0
+              with:
+                  image-ref: "log8100projet/projetfinal:latest"
+                  format: table
+                  scan-type: image
+            - name: Upload trivy artifact results
+              uses: actions/upload-artifact@v4
+              with:
+                  name: trivy-report
+                  path: trivy-report.json
+                  retention-days: 30
+            # - name: Install Dependencies
+            #   run: |
+            #       curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+            #       sudo install minikube-linux-amd64 /usr/local/bin/minikube
 
-            - name: Start Minikube with Nodes
-              run: |
-                  chmod +x ./terraform/setup_minikube.sh
-                  ./terraform/setup_minikube.sh
+            # - name: Start Minikube with Nodes
+            #   run: |
+            #       chmod +x ./terraform/setup_minikube.sh
+            #       ./terraform/setup_minikube.sh
 
-            - name: Run Terraform Apply
-              working-directory: ./terraform
-              run: |
-                  terraform init
-                  terraform apply -auto-approve
+            # - name: Run Terraform Apply
+            #   working-directory: ./terraform
+            #   run: |
+            #       terraform init
+            #       terraform apply -auto-approve
 
-            - name: Run Ansible Playbook for Initial Configuration
-              run: |
-                  ansible-playbook ./ansible/playbook.yml
+            # - name: Run Ansible Playbook for Initial Configuration
+            #   run: |
+            #       ansible-playbook ./ansible/playbook.yml
