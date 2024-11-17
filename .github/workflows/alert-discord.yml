@@ -1,0 +1,30 @@
+name: Alert Discord on Vulnerabilities
+
+on:
+  schedule:
+    - cron: '0 0 * * 1'  # Exécute chaque semaine
+  workflow_dispatch:  # Permet de lancer manuellement
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Dependabot Alerts to Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          echo "Fetching Dependabot alerts..."
+          alerts=$(gh api -H "Accept: application/vnd.github+json" /repos/${{ github.repository }}/dependabot/alerts)
+
+          if [[ "$alerts" != "[]" ]]; then
+            echo "Found vulnerabilities. Sending to Discord..."
+            curl -H "Content-Type: application/json" -d '{
+              "content": "Dependabot found vulnerabilities in the repository! Details: '$alerts'"
+            }' $DISCORD_WEBHOOK
+          else
+            echo "No vulnerabilities found."
+          fi
