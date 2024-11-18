@@ -51,6 +51,7 @@ jobs:
                   image-ref: "log8100projet/projetfinal:latest"
                   format: "sarif"
                   scan-type: image
+                  scanner: vuln
                   output: "trivy-report.sarif"
                   # adding this argument because scanning is too slow
             - name: Upload Trivy scan results to GitHub Security tab
