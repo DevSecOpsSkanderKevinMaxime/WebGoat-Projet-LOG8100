@@ -53,7 +53,7 @@ jobs:
                   scan-type: image
                   output: trivy-report.json
                   # adding this argument because scanning is too slow
-                  args: "--scanners vuln"
+                  args: "--scanners vuln --cache-dir ~/.cache/trivy"
             - name: Upload trivy artifact results
               uses: actions/upload-artifact@v4
               with:
