@@ -1,4 +1,4 @@
-name: Publish Docker image
+name: deployment
 
 on:
     # workflow_run:
@@ -8,6 +8,8 @@ on:
     push:
         branches:
             - feature/image-analysis-tools
+permissions:
+    security-events: write
 
 jobs:
     push_to_registry:
