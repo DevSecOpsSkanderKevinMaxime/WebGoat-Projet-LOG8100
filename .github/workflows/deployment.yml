@@ -19,6 +19,7 @@ jobs:
             attestations: write
             id-token: write
             actions: read
+            security-events: write
         steps:
             - name: Check out the repo
               uses: actions/checkout@v2
