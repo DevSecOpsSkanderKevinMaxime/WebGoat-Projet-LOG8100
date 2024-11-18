@@ -8,8 +8,6 @@ on:
     push:
         branches:
             - feature/image-analysis-tools
-permissions:
-    security-events: write
 
 jobs:
     push_to_registry:
@@ -20,6 +18,7 @@ jobs:
             contents: read
             attestations: write
             id-token: write
+            actions: read
         steps:
             - name: Check out the repo
               uses: actions/checkout@v2
