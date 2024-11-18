@@ -7,7 +7,7 @@ on:
     #     - completed
     push:
         branches:
-            - feature/image-analysis-tools
+            - main
 
 jobs:
     push_to_registry:
