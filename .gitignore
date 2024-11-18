@@ -57,3 +57,4 @@ TestClass.class
 /.gitconfig
 .venv/
 webgoat.gitconfig
+**/.terraform/*
