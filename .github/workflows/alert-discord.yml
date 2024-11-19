@@ -1,0 +1,48 @@
+name: Alert Discord on Vulnerabilities
+
+on:
+  schedule:
+    - cron: '0 0 * * 1'  # Exécute chaque semaine
+  workflow_dispatch:  # Permet de lancer manuellement
+  pull_request:
+    branches: [ main ]
+  push:
+    branches:
+      - main
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: read # Add this line to access Dependabot alerts
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Dependabot Alerts to Discord
+        env:
+          DISCORD: ${{ secrets.DISCORD }}
+          GH_TOKEN: ${{ secrets.DISPATTOKEN }}
+        run: |
+          echo "Fetching Dependabot alerts from the default branch..."
+          alerts=$(gh api -H "Accept: application/vnd.github+json" /repos/${{ github.repository }}/dependabot/alerts)
+          echo "Alerts Response: $alerts"
+
+          if [[ "$alerts" != "[]" ]]; then
+            echo "Found vulnerabilities. Formatting data for Discord..."
+
+            # Parse and format the alerts
+            formatted_alerts=$(echo "$alerts" | jq -r '.[] | "🚨 **Dependabot Alert** 🚨\n- **Package**: \(.dependency.package.name) \n- **Severity**: \(.security_vulnerability.severity) \n- **Summary**: \(.security_advisory.summary) \n- **More Info**: \(.html_url)"')
+
+            echo "Formatted Alerts:"
+            echo "$formatted_alerts"
+
+            # Send each alert to Discord
+            echo "$formatted_alerts" | while IFS= read -r alert; do
+              curl -H "Content-Type: application/json" -d "$(jq -n --arg content "$alert" '{content: $content}')" $DISCORD
+            done
+          else
+            echo "No vulnerabilities found."
+          fi
