@@ -44,5 +44,5 @@ jobs:
               curl -H "Content-Type: application/json" -d "$(jq -n --arg content "$alert" '{content: $content}')" $DISCORD
             done
           else
-            echo "No vulnerabilities found."
+            echo "No vulnerabilities  found."
           fi
