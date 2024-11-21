@@ -24,7 +24,7 @@ jobs:
       - name: Dependabot Alerts to Discord
         env:
           DISCORD: ${{ secrets.DISCORD }}
-          GH_TOKEN: ${{ secrets.DISPATTOKEN }}
+          GH_TOKEN: ${{ secrets.TOKEN_SKANDER }}
         run: |
           echo "Fetching Dependabot alerts from the default branch..."
           alerts=$(gh api -H "Accept: application/vnd.github+json" /repos/booskander/${{ github.repository }}/dependabot/alerts)
