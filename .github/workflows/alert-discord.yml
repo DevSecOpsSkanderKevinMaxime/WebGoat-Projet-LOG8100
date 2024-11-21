@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      security-events: read # Add this line to access Dependabot alerts
+      security-events: write # Add this line to access Dependabot alerts
 
     steps:
       - name: Checkout code
