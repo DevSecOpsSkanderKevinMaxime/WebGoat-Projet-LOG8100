@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      security-events: write # Add this line to access Dependabot alerts
+      security-events: read # Add this line to access Dependabot alerts
 
     steps:
       - name: Checkout code
@@ -27,7 +27,7 @@ jobs:
           GH_TOKEN: ${{ secrets.DISPATTOKEN }}
         run: |
           echo "Fetching Dependabot alerts from the default branch..."
-          alerts=$(gh api -H "Accept: application/vnd.github+json" /repos/${{ github.repository }}/dependabot/alerts)
+          alerts=$(gh api -H "Accept: application/vnd.github+json" /repos/booskander/${{ github.repository }}/dependabot/alerts)
           echo "Alerts Response: $alerts"
 
           if [[ "$alerts" != "[]" ]]; then
