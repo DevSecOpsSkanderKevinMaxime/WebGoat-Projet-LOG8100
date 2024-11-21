@@ -53,6 +53,7 @@ jobs:
                   image-ref: "log8100projet/projetfinal:latest"
                   format: sarif
                   scan-type: image
+                  cache: "false"
                   scanners: vuln
                   output: trivy-report.sarif
                   # adding this argument because scanning is too slow
