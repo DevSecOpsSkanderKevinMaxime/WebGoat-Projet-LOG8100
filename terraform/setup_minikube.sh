@@ -23,4 +23,5 @@ if [ ${#nodes[@]} -ge 2 ]; then
 else
   echo "Not enough nodes available for labeling."
   exit 1
+
 fi
