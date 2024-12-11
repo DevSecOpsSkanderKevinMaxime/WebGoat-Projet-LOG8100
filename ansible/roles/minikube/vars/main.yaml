@@ -1,0 +1,4 @@
+---
+minikube_memory: 2048  # Mémoire totale en Mo (2 Go)
+minikube_cpus: 2       # Nombre total de vCPUs
+minikube_nodes: 2      # Nombre de nœuds dans le cluster

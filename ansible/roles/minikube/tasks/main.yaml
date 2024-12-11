@@ -1,0 +1,59 @@
+---
+- name: Mettre à jour le cache des paquets
+  apt:
+    update_cache: yes
+
+- name: Installer les dépendances nécessaires pour Minikube
+  apt:
+    name:
+      - curl
+      - apt-transport-https
+      - ca-certificates
+      - software-properties-common
+      - conntrack
+    state: present
+    update_cache: yes
+
+- name: Télécharger le binaire Minikube
+  get_url:
+    url: "https://storage.googleapis.com/minikube/releases/v1.34.0/minikube-linux-amd64"
+    dest: /usr/local/bin/minikube
+    mode: '0755'
+
+- name: Vérifier l'installation de Minikube
+  command: "minikube version"
+  register: minikube_version
+  changed_when: false
+
+- name: Supprimer le cluster Minikube existant (si présent)
+  command: "minikube delete"
+  ignore_errors: true
+
+- name: Ajuster les permissions sur /tmp
+  file:
+    path: /tmp
+    state: directory
+    mode: "1777"
+
+- name: Démarrer Minikube avec le driver docker
+  command: "sudo minikube start --driver=docker --nodes={{ minikube_nodes }} --memory={{ minikube_memory }} --force --cpus={{ minikube_cpus }}"
+  register: minikube_start
+
+- name: Vérifier que Minikube est prêt
+  command: "minikube status"
+  register: minikube_status
+  until: "'host: Running' in minikube_status.stdout and 'apiserver: Running' in minikube_status.stdout"
+  retries: 5
+  delay: 10
+
+- name: Afficher le statut de Minikube
+  debug:
+    msg: "{{ minikube_status.stdout }}"
+
+- name: Lister les noeuds dans le cluster
+  shell: "minikube kubectl -- get nodes"
+  register: kubectl_nodes
+
+- name: Afficher les nœuds Kubernetes
+  debug:
+    msg: "{{ kubectl_nodes.stdout }}"

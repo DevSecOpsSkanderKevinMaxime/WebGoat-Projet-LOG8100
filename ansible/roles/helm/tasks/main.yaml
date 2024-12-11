@@ -1,0 +1,48 @@
+---
+- name: Télécharger et installer Helm
+  get_url:
+    url: https://get.helm.sh/helm-v3.13.0-linux-amd64.tar.gz
+    dest: /tmp/helm.tar.gz
+
+- name: Extraire le binaire Helm
+  unarchive:
+    src: /tmp/helm.tar.gz
+    dest: /tmp/
+    remote_src: yes
+
+- name: Déplacer Helm dans /usr/local/bin
+  copy:
+    src: /tmp/linux-amd64/helm
+    dest: /usr/local/bin/helm
+    mode: '0755'
+
+- name: Vérifier l'installation de Helm
+  command: helm version
+  register: helm_version
+  changed_when: false
+
+- name: Ajouter le dépôt Prometheus
+  command: helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+  args:
+    warn: false
+
+- name: Ajouter le dépôt stable
+  command: helm repo add stable https://charts.helm.sh/stable
+  args:
+    warn: false
+
+- name: Mettre à jour les dépôts Helm
+  command: helm repo update
+  args:
+    warn: false
+
+- name: Installer Prometheus et Grafana
+  command: >
+    helm upgrade --install monitoring prometheus-community/kube-prometheus-stack
+    --namespace log8100projetns
+    --create-namespace
+  args:
+    warn: false
+
+- name: Vérifier les pods déployés
+  command: kubectl get pods -n log8100projetns

@@ -1,0 +1,9 @@
+---
+- name: Désactiver le swap
+  command: swapoff -a
+
+- name: S'assurer que le swap est désactivé au démarrage
+  replace:
+    path: /etc/fstab
+    regexp: '^.*\\s+swap\\s+.*$'
+    replace: '# \0'

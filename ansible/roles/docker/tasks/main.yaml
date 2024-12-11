@@ -1,0 +1,49 @@
+---
+- name: Mettre à jour le cache des paquets
+  apt:
+    update_cache: yes
+
+- name: Installer les dépendances requises pour Docker
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+      - gnupg
+      - lsb-release
+    state: present
+    update_cache: yes
+
+- name: Ajouter la clé GPG de Docker
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Ajouter le dépôt Docker
+  apt_repository:
+    repo: "deb https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+
+- name: Mettre à jour le cache des paquets après ajout du dépôt Docker
+  apt:
+    update_cache: yes
+
+- name: Installer Docker CE
+  apt:
+    name: docker-ce
+    state: present
+
+- name: Activer et démarrer Docker
+  systemd:
+    name: docker
+    enabled: yes
+    state: started
+
+- name: Vérifier que Docker est installé
+  command: docker --version
+  register: docker_version_output
+
+- name: Afficher la version de Docker
+  debug:
+    msg: "Docker est installé avec la version : {{ docker_version_output.stdout }}"

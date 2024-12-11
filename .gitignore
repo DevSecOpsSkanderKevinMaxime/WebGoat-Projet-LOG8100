@@ -58,3 +58,11 @@ TestClass.class
 .venv/
 webgoat.gitconfig
 **/.terraform/*
+
+.env
+*.tfvars
+*.tfstate
+*.terraform
+*.backup
+*.hcl
+*.info

@@ -1,0 +1,7 @@
+---
+- name: Installer et déployer Helm (Prometheus et Grafana)
+  hosts: localhost
+  become: yes
+
+  roles:
+    - helm
