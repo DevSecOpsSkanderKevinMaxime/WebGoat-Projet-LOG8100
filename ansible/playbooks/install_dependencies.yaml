@@ -1,10 +1,10 @@
 ---
 - name: Installer toutes les dépendances nécessaires
-  hosts: all
+  hosts: localhost
   become: yes
 
   roles:
-    - docker         # Appelle le rôle pour installer Docker
+    #- docker         # Appelle le rôle pour installer Docker
     #- minikube     # Appelle le rôle pour installer Kubernetes
     - helm           # Appelle le rôle pour installer Helm
-    - swap_disable   # Appelle le rôle pour désactiver le swap
+    #- swap_disable   # Appelle le rôle pour désactiver le swap
