@@ -28,7 +28,7 @@ jobs:
         run: |
           echo "Fetching CodeQL alerts from the repository..."
           alerts=$(gh api -H "Accept: application/vnd.github+json" /repos/${{ github.repository }}/code-scanning/alerts)
-
+          echo "Alerts Response: $alerts"
           # Check if alerts exist
           if [[ "$alerts" == "[]" ]]; then
             echo "No CodeQL vulnerabilities found."
@@ -42,8 +42,6 @@ jobs:
           "**Severity**: \(.rule.severity | ascii_upcase)\n" +
           "**Description**: \(.rule.description)\n" +
           "**File**: \(.most_recent_instance.location.path)\n" +
-          "**Line**: \(.most_recent_instance.location.start_line)\n" +
-          "**Link**: [View Details](\(.html_url))\n---"')
 
           # Send formatted alerts to Discord
           echo "$formatted_alerts" | while read -r alert; do
