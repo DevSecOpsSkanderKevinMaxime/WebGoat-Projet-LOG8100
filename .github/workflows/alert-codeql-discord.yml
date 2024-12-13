@@ -29,6 +29,8 @@ jobs:
           echo "Fetching CodeQL alerts from the repository..."
           alerts=$(gh api -H "Accept: application/vnd.github+json" /repos/${{ github.repository }}/code-scanning/alerts)
           echo "Alerts Response: $alerts"
+          
+          echo "-------------------------------------------------------------------------"
 
           if [[ "$alerts" != "[]" ]]; then
             echo "Found vulnerabilities. Sending raw alerts data to Discord..."
