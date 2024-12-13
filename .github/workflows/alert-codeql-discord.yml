@@ -21,9 +21,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: CodeQL Alerts to Discord
+        - name: CodeQL Alerts to Discord
         env:
-          DISCORD: ${{ secrets.DISCORD }}
+          DISCORD: ${{ secrets.DISCORDTWO }}
           GH_TOKEN: ${{ secrets.TOKEN_SKANDER }}
         run: |
           echo "Fetching CodeQL alerts from the repository..."
@@ -35,14 +35,15 @@ jobs:
             exit 0
           fi
 
-          # Format alerts
-          echo "Found vulnerabilities. Formatting alerts..."
-          formatted_alerts=$(echo "$alerts" | jq -r '.[] | 
-          "🚨 **Rule**: \(.rule.name)\n" +
-          "**Severity**: \(.rule.tags[0])\n" +
+          # Extract and format alerts
+          echo "Formatting alerts..."
+          formatted_alerts=$(echo "$alerts" | jq -r '.[] |
+          "🚨 **Vulnerability**: \(.rule.id)\n" +
+          "**Severity**: \(.rule.severity | ascii_upcase)\n" +
           "**Description**: \(.rule.description)\n" +
           "**File**: \(.most_recent_instance.location.path)\n" +
-          "**Fixed Version**: \(.rule.help // "Not specified")\n---"')
+          "**Line**: \(.most_recent_instance.location.start_line)\n" +
+          "**Link**: [View Details](\(.html_url))\n---"')
 
           # Send formatted alerts to Discord
           echo "$formatted_alerts" | while read -r alert; do
@@ -50,4 +51,3 @@ jobs:
                  -d "$(jq -n --arg content "$alert" '{content: $content}')" \
                  "$DISCORD"
           done
-
