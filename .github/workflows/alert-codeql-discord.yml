@@ -15,15 +15,15 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      security-events: read  # Add this line to access security alerts
+      security-events: read  # Permet d'accéder aux alertes de sécurité
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: CodeQL Alerts to Discord
+      - name: Fetch and Send CodeQL Alerts to Discord
         env:
-          DISCORD: ${{ secrets.DISCORDTWO }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORDTWO }}
           GH_TOKEN: ${{ secrets.TOKEN_SKANDER }}
         run: |
           echo "Fetching CodeQL alerts from the repository..."
@@ -38,13 +38,13 @@ jobs:
           # Extract and format alerts
           echo "Formatting alerts..."
           formatted_alerts=$(echo "$alerts" | jq -r '.[] |
-          "🚨 **Vulnerability**: \(.rule.id)\n" +
-          "**Severity**: \(.rule.severity | ascii_upcase)\n" +
-          "**Description**: \(.rule.description)\n"
+            "🚨 **Vulnerability**: \(.rule.id)\n**Severity**: \(.rule.severity | ascii_upcase)\n**Description**: \(.rule.description)\n"')
 
           # Send formatted alerts to Discord
-          echo "$formatted_alerts" | while read -r alert; do
-            curl -H "Content-Type: application/json" \
+          echo "$formatted_alerts" | while IFS= read -r alert; do
+            echo "Sending alert to Discord..."
+            curl -X POST \
+                 -H "Content-Type: application/json" \
                  -d "$(jq -n --arg content "$alert" '{content: $content}')" \
-                 "$DISCORD"
+                 "$DISCORD_WEBHOOK"
           done
