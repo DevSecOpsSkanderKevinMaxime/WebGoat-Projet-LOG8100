@@ -21,18 +21,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: CodeQL Alerts to Discord
+      - name: Fetch CodeQL alerts
         env:
-          DISCORD: ${{ secrets.DISCORDTWO }}
-          GH_TOKEN: ${{ secrets.TOKEN_SKANDER }}
+            DISCORD: ${{ secrets.DISCORDTWO }}
+            GH_TOKEN: ${{ secrets.TOKEN_SKANDER }}
         run: |
+          echo "Authenticating with GitHub CLI..."
+          gh auth status || gh auth login --with-token <<< "$GH_TOKEN"
+
           echo "Fetching CodeQL alerts from the repository..."
           alerts=$(gh api -H "Accept: application/vnd.github+json" /repos/${{ github.repository }}/code-scanning/alerts)
-          echo "Alerts Response: $alerts"
-          if [[ "$alerts" != "[]" ]]; then
-            echo "Found vulnerabilities. Sending raw alerts data to Discord..."
 
-            # Send the raw alerts to Discord
-            curl -H "Content-Type: application/json" -d "$(jq -n --arg content "$alerts" '{content: $content}')" $DISCORD
+          echo "Alerts Response: $alerts"
+
+          if [[ -z "$alerts" || "$alerts" == "[]" ]]; then
+            echo "No vulnerabilities found."
           else
-            echo "No CodeQL vulnerabilities found."
+            echo "Vulnerabilities found."
+            # Convert alerts to Discord message
+            discord_message=$(echo "$alerts" | jq -r '.[0] | {content: .html_url}' | jq -c .)
+
+            echo "Sending alerts to Discord..."
+            curl -H "Content-Type: application/json" -d "$discord_message" $DISCORD
+          fi
+
