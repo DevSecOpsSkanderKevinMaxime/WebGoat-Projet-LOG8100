@@ -1,0 +1,39 @@
+name: Alert Discord on CodeQL Vulnerabilities
+
+on:
+  schedule:
+    - cron: '0 0 * * 1'  # Exécute chaque semaine
+  workflow_dispatch:  # Permet de lancer manuellement
+  pull_request:
+    branches: [ main ]
+  push:
+    branches:
+      - main
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: read  # Add this line to access security alerts
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: CodeQL Alerts to Discord
+        env:
+          DISCORD: ${{ secrets.DISCORDTWO }}
+          GH_TOKEN: ${{ secrets.TOKEN_SKANDER }}
+        run: |
+          echo "Fetching CodeQL alerts from the repository..."
+          alerts=$(gh api -H "Accept: application/vnd.github+json" /repos/${{ github.repository }}/code-scanning/alerts)
+          echo "Alerts Response: $alerts"
+
+          if [[ "$alerts" != "[]" ]]; then
+            echo "Found vulnerabilities. Sending raw alerts data to Discord..."
+
+            # Send the raw alerts to Discord
+            curl -H "Content-Type: application/json" -d "$(jq -n --arg content "$alerts" '{content: $content}')" $DISCORD
+          else
+            echo "No CodeQL vulnerabilities found."
