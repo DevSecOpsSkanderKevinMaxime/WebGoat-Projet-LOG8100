@@ -21,7 +21,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-        - name: CodeQL Alerts to Discord
+      - name: CodeQL Alerts to Discord
         env:
           DISCORD: ${{ secrets.DISCORDTWO }}
           GH_TOKEN: ${{ secrets.TOKEN_SKANDER }}
