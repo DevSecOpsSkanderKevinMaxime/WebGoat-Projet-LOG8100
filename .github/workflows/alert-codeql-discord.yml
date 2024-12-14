@@ -31,12 +31,14 @@ jobs:
             exit 0
           fi
 
-          formatted_alerts=$(echo "$alerts" | jq -r '.[] | 
-            "🚨 **Vulnerability**: \(.rule.id)\n" +
+          # Format and extract only necessary fields
+          formatted_alerts=$(echo "$alerts" | jq -r '.[] |
+            "🚨 **ID**: \(.rule.id)\n" +
             "**Severity**: \(.rule.severity | ascii_upcase)\n" +
             "**Description**: \(.rule.description)\n---\n"')
 
-          echo "$formatted_alerts" | sort | uniq | while IFS= read -r alert; do
+          # Send alerts to Discord
+          echo "$formatted_alerts" | while IFS= read -r alert; do
             curl -X POST \
                  -H "Content-Type: application/json" \
                  -d "$(jq -n --arg content "$alert" '{content: $content}')" \
